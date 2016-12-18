@@ -1,34 +1,55 @@
 <!doctype html>
 <html>
 <head>
-    <title>Socket.IO chat</title>
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font: 13px Helvetica, Arial; }
-        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-        form input { border: 0; padding: 10px; width: 90%; margin-right: .5%; }
-        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li { padding: 5px 10px; }
-        #messages li:nth-child(odd) { background: #eee; }
-    </style>
+    <title>Redes 2016 - Chat Messenger</title>
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 </head>
 <body>
-<ul id="messages"></ul>
-<form action="">
-    <input id="m" autocomplete="off" /><button>Send</button>
+<div class="container">
+    <div class="row">
+        <div class="col s8 m8 l8 bordered">
+            <ul id="messages"></ul>
+        </div>
+        <div class="col s4 m4 l4">
+            <ul id="users"></ul>
+        </div>
+    </div>
+</div>
+<form action="" method="post">
+    <div class="container">
+        <div class="row">
+            <div class="input-field">
+                <input class="bottom" id="m" autocomplete="off" />
+                <button class="btn btn-large right">Enviar</button>
+            </div>
+        </div>
+    </div>
 </form>
 <script src="/socket.io/socket.io.js"></script>
-<script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script>
     var socket = io();
     $('form').submit(function(){
-        socket.emit('chat message', $('#m').val());
-        $('#m').val('');
+        socket.emit('chat message', $('#m').val()); // emite o evento de envio de mensagem
+        $('#m').val('');                            // limpa o conteúdo da caixa de texto
         return false;
     });
     socket.on('chat message', function(msg){
         $('#messages').append($('<li>').text(msg));
+    });
+    socket.on('conect', function(username){
+        $("#users").empty();
+        for(var i=0; i< username.length; i++)
+            $('#users').append($('<li>').text(username[i] + " - (online)"));
+    });
+
+    socket.on('update', function(username){
+        $("#users").empty();
+        for(var i=0; i< username.length; i++)
+            $('#users').append($('<li>').text(username[i] + " - (online)"));
     });
 </script>
 </body>
