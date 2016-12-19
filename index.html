@@ -31,7 +31,8 @@
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script>
-    var socket = io();
+    var socket = io(); //cliente
+
     $('form').submit(function(){
         socket.emit('chat message', $('#m').val()); // emite o evento de envio de mensagem
         $('#m').val('');                            // limpa o conteúdo da caixa de texto
@@ -39,17 +40,17 @@
     });
 
     socket.on('chat message', function(msg, user){
-        $('#messages').append($('<li>').text(user + " diz: " + msg));
+        $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
     });
 
 
     socket.on('leave chat', function(msg){
-        $('#messages').append($('<li class="red-text">').text(msg));
+        $('#messages').append($('<li class="red-text">').text(msg)); // Ao receber um evento de saída avisa os demais usuários
     });
 
 
     socket.on('conect', function(username, user){
-        $('#messages').append($('<li class="green-text">').text(user + " entrou na sala"));
+        $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários
         $("#users").empty();
         for(var i=0; i< username.length; i++)
             $('#users').append($('<li>').text(username[i] + " - (online)"));
@@ -58,7 +59,7 @@
     socket.on('update', function(username){
         $("#users").empty();
         for(var i=0; i< username.length; i++)
-            $('#users').append($('<li>').text(username[i] + " - (online)"));
+            $('#users').append($('<li>').text(username[i] + " - (online)")); // Atualiza a lista de usuários onlines
     });
 </script>
 </body>
