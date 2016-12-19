@@ -37,10 +37,19 @@
         $('#m').val('');                            // limpa o conteúdo da caixa de texto
         return false;
     });
-    socket.on('chat message', function(msg){
-        $('#messages').append($('<li>').text(msg));
+
+    socket.on('chat message', function(msg, user){
+        $('#messages').append($('<li>').text(user + " diz: " + msg));
     });
-    socket.on('conect', function(username){
+
+
+    socket.on('leave chat', function(msg){
+        $('#messages').append($('<li class="red-text">').text(msg));
+    });
+
+
+    socket.on('conect', function(username, user){
+        $('#messages').append($('<li class="green-text">').text(user + " entrou na sala"));
         $("#users").empty();
         for(var i=0; i< username.length; i++)
             $('#users').append($('<li>').text(username[i] + " - (online)"));

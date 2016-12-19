@@ -10,7 +10,6 @@ var username = [];
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: false }));
-
 // parse application/json
 app.use(bodyParser.json());
 
@@ -37,18 +36,18 @@ io.on('connection', function(socket){
     var user = username[count];
     var id = count;
     count++;
-    io.emit('conect', username);    //envia a lista de usuário onlines para o cliente
-    io.emit('chat message', "usuário " + user + " entrou na conversa");
+    io.emit('conect', username, user);    //envia a lista de usuário onlines para o cliente
 
 
     socket.on('disconnect', function(){
-        io.emit('chat message', "Usuário " + user + " saiu da conversa");
+        io.emit('leave chat', user + " saiu da conversa");
         count --;
         username.splice(id,1);
         io.emit("update", username);
 
     });
+
     socket.on('chat message', function(msg){
-        io.emit('chat message', msg);
+        io.emit('chat message', msg, user);
     });
 });
