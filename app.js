@@ -32,7 +32,6 @@ app.get('/private', function (req, res) {
 
 });
 
-
 http.listen(3000, function(){
     console.log('listening on *:3000');
 });
@@ -57,13 +56,13 @@ io.sockets.on('connection', function(socket){
         io.emit('chat message', msg, user);
     });
 
-    socket.on('private', function (msg) {
-        var position = username.indexOf("Marcus");
+    socket.on('private', function (msg,to) {
+        var position = username.indexOf(to);
         console.log(username);
         console.log(position);
         console.log(sockets);
         console.log(sockets[position]);
-        socket.broadcast.to(sockets[position]).emit('chat message', "bla bla bla", "teste teste teste");
+        socket.broadcast.to(sockets[position]).emit('private message', msg, user);
     });
 
 });

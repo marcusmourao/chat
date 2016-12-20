@@ -5,16 +5,13 @@
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/css/materialize.min.css">
     <!-- Compiled and minified JavaScript -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 </head>
 <body>
 
 <nav>
     <div class="nav-wrapper">
-        <a href="#" class="brand-logo">Logo</a>
+        <a href="#" class="brand-logo">Redes 2016 - Chat</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/create">Criar sala privada</a></li>
-            <li><a href="/enter">Entrar em sala privada</a></li>
         </ul>
     </div>
 </nav>
@@ -39,39 +36,55 @@
         </div>
     </div>
 </div>
-<form action="" method="post">
+<form id="formMessage" action="" method="post">
     <div class="container">
         <div class="row">
             <div class="input-field">
-                <input class="bottom" id="m" autocomplete="off" />
+                <input name="message" id="message" type="text" class="validate bottom" autocomplete="off">
+                <label for="message">Mensagem</label>
                 <button class="btn btn-large right">Enviar</button>
             </div>
         </div>
         <div class="row">
-            <div class="col s6 m6 l6">
-                <a id="private" class="left" >Criar chat privado</a>
+            <div class="col s6 m6 l6 ">
+                <div class="input-field">
+                    <input id="privateUsername" type="text" class="validate bottom" autocomplete="off">
+                    <label for="privateUsername">Username do usuário destino</label>
+                        <a id="private" class=" btn btn-large left orange darken-4" >Enviar mensagem privada</a>
+                </div>
             </div>
         </div>
     </div>
 </form>
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+
 <script>
+    $(document).ready(function() {
+        $('select').material_select();
+    });
+
     var socket = io(); //cliente
 
     $('form').submit(function(){
-        socket.emit('chat message', $('#m').val()); // emite o evento de envio de mensagem
-        $('#m').val('');                            // limpa o conteúdo da caixa de texto
+        socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem
+        $('#message').val('');                            // limpa o conteúdo da caixa de texto
         return false;
     });
 
-    $("#private").click(function () {
-        socket.emit('private', "bla bla bla");
-    });
 
+    $("#private").click(function () {
+        socket.emit('private', $('#message').val(), $('#privateUsername').val()); // emite o evento de envio de mensagem privada
+        $('#message').val('');                            // limpa o conteúdo da caixa de texto
+    });
 
     socket.on('chat message', function(msg, user){
         $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
+    });
+
+    ocket.on('private message', function(msg, user){
+        $('#messages').append($('<li class="orange darken-4">').text(user + " diz: " + msg + " (mensagem privada)")); // Ao receber uma mensagem atualiza a tela
     });
 
 
@@ -83,14 +96,15 @@
     socket.on('conect', function(username, user){
         $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários
         $("#users").empty();
-        for(var i=0; i< username.length; i++)
-            $('#users').append("<tr><td> " + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
+        for(var i=0; i< username.length; i++) {
+            $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
+        }
     });
-
-    socket.on('update', function(username){
+    socket.on('update', function(username) {
         $("#users").empty();
-        for(var i=0; i< username.length; i++)
-            $('#users').append("<tr><td onclick='privateRoom()'>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
+        for (var i = 0; i < username.length; i++) {
+            $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
+        }
     });
 </script>
 </body>
