@@ -61,49 +61,46 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 
 <script>
-    $(document).ready(function() {
-        $('select').material_select();
-    });
 
     var socket = io(); //cliente
 
-    $('form').submit(function(){
-        socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem
+    $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem
+        socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
         $('#message').val('');                            // limpa o conteúdo da caixa de texto
         return false;
     });
 
 
-    $("#private").click(function () {
-        socket.emit('private', $('#message').val(), $('#privateUsername').val()); // emite o evento de envio de mensagem privada
+    $("#private").click(function () {                                             // Quando o usuário clica no botão de enviar mensagem, privada
+        socket.emit('private', $('#message').val(), $('#privateUsername').val()); // emite o evento de envio de mensagem privada para o socket
         $('#message').val('');                                                    // limpa o conteúdo da caixa de texto
     });
 
-    socket.on('chat message', function(msg, user){
+    socket.on('chat message', function(msg, user){                    // Cliente ao receber um evento de chat message
         $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
     });
 
-    socket.on('private message', function(msg, user){
+    socket.on('private message', function(msg, user){                                                             // Cliente ao receber evento de mensagem privada
         $('#messages').append($('<li class="orange-text">').text(user + " diz: " + msg + " (mensagem privada)")); // Ao receber uma mensagem atualiza a tela
     });
 
-    socket.on('personal', function(msg, user, userDestination){
+    socket.on('personal', function(msg, user, userDestination){                                                                                 // Cliente ao receber um evento de mensagem personal
         $('#messages').append($('<li class="orange-text">').text(user + " diz: " + msg + " (mensagem privada para: "+ userDestination + " )")); // Ao receber uma mensagem atualiza a tela
     });
 
 
-    socket.on('leave chat', function(msg){
+    socket.on('leave chat', function(msg){                           // Cliente ao receber um evento de saída do chat
         $('#messages').append($('<li class="red-text">').text(msg)); // Ao receber um evento de saída avisa os demais usuários
     });
 
-    socket.on('conect', function(username, user){
+    socket.on('conect', function(username, user){                                           // Cliente ao receber um evento de entrada no chat
         $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários
         $("#users").empty();
         for(var i=0; i< username.length; i++) {
             $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
         }
     });
-    socket.on('update', function(username) {
+    socket.on('update', function(username) {                             // Atualiza a lista de contatos online, necessário quando alguém sai do chat
         $("#users").empty();
         for (var i = 0; i < username.length; i++) {
             $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
