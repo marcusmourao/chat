@@ -8,17 +8,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 </head>
 <body>
-
-<nav>
-    <div class="nav-wrapper">
-        <a href="#" class="brand-logo">Logo</a>
-        <ul id="nav-mobile" class="right hide-on-med-and-down">
-            <li><a href="/create">Criar sala privada</a></li>
-            <li><a href="/enter">Entrar em sala privada</a></li>
-        </ul>
-    </div>
-</nav>
-
 <div class="container">
     <div class="row">
         <div class="col s8 m8 l8">
@@ -27,9 +16,9 @@
         <div class="col s4 m4 l4">
             <table class="centered striped bordered">
                 <thead>
-                    <tr>
-                        <th> Usuários Online </th>
-                    </tr>
+                <tr>
+                    <th> Usuários Online </th>
+                </tr>
                 </thead>
                 <tbody id="users">
 
@@ -44,12 +33,12 @@
         <div class="row">
             <div class="input-field">
                 <input class="bottom" id="m" autocomplete="off" />
-                <button class="btn btn-large right">Enviar</button>
             </div>
         </div>
         <div class="row">
             <div class="col s6 m6 l6">
-                <a id="private" class="left" >Criar chat privado</a>
+                <a class="left" href="/private">Criar chat privado</a>
+                <a class="left" href="/private">Entrar em sala privada</a>
             </div>
         </div>
     </div>
@@ -65,10 +54,9 @@
         return false;
     });
 
-    $("#private").click(function () {
-        socket.emit('private', "bla bla bla");
-    });
-
+    function privateRoom(){
+        console.log("teste");
+    }
 
     socket.on('chat message', function(msg, user){
         $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
@@ -84,7 +72,7 @@
         $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários
         $("#users").empty();
         for(var i=0; i< username.length; i++)
-            $('#users').append("<tr><td> " + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
+            $('#users').append("<tr><td onclick='privateRoom()'> " + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
     });
 
     socket.on('update', function(username){
