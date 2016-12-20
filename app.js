@@ -58,10 +58,6 @@ io.sockets.on('connection', function(socket){
 
     socket.on('private', function (msg,to) {
         var position = username.indexOf(to);
-        console.log(username);
-        console.log(position);
-        console.log(sockets);
-        console.log(sockets[position]);
         socket.broadcast.to(sockets[position]).emit('private message', msg, user);
     });
 
