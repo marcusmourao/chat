@@ -76,22 +76,25 @@
 
     $("#private").click(function () {
         socket.emit('private', $('#message').val(), $('#privateUsername').val()); // emite o evento de envio de mensagem privada
-        $('#message').val('');                            // limpa o conteúdo da caixa de texto
+        $('#message').val('');                                                    // limpa o conteúdo da caixa de texto
     });
 
     socket.on('chat message', function(msg, user){
         $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
     });
 
-    ocket.on('private message', function(msg, user){
-        $('#messages').append($('<li class="orange darken-4">').text(user + " diz: " + msg + " (mensagem privada)")); // Ao receber uma mensagem atualiza a tela
+    socket.on('private message', function(msg, user){
+        $('#messages').append($('<li class="orange-text">').text(user + " diz: " + msg + " (mensagem privada)")); // Ao receber uma mensagem atualiza a tela
+    });
+
+    socket.on('personal', function(msg, user, userDestination){
+        $('#messages').append($('<li class="orange-text">').text(user + " diz: " + msg + " (mensagem privada para: "+ userDestination + " )")); // Ao receber uma mensagem atualiza a tela
     });
 
 
     socket.on('leave chat', function(msg){
         $('#messages').append($('<li class="red-text">').text(msg)); // Ao receber um evento de saída avisa os demais usuários
     });
-
 
     socket.on('conect', function(username, user){
         $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários

@@ -56,9 +56,14 @@ io.sockets.on('connection', function(socket){
         io.emit('chat message', msg, user);
     });
 
-    socket.on('private', function (msg,to) {
+    socket.on('private', function (msg,to){
         var position = username.indexOf(to);
+        console.log(username);
+        console.log(position);
+        console.log(sockets);
+        console.log(sockets[position]);
         socket.broadcast.to(sockets[position]).emit('private message', msg, user);
+        socket.emit('personal', msg, user, to);
     });
 
 });
