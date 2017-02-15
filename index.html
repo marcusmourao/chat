@@ -53,7 +53,10 @@
 
 <script>
 
-    var id = Number(window.location.pathname.match(/\/chat\/(\d+)$/)[1]);[]
+    var pathName = window.location.pathname.toString();
+    var id = pathName.replace("/chat/", '');
+    console.log(id);
+
     var socket = io('/' + id); //cliente
 
     $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem

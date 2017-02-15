@@ -15,19 +15,15 @@ var db = mongoose.connection;
     db.once('open', function() {
 });
 
-var messageSchema = mongoose.Schema({
-    timestamp: Date,            
-    text: String,
-    user: String          
-});
-
-var Message = mongoose.model('Message', messageSchema);
 
 var historySchema = mongoose.Schema({
     socket_id: String,
     c_id: String,
     p_id: String,
-    messages: String
+    messages: [{
+        text: String,
+        user: String
+    }]
 });
 
 var History = mongoose.model('History', historySchema);
@@ -57,31 +53,28 @@ http.listen(3000, function(){
 });
 
 function createSocket(name) {
-  
+
+    console.log(name);
     var namespace = io.of('/' + name);
     namespace.on('connection', function(socket){
 
-        var c_id = namespace.split('p')[0];
-        var p_id = namespace.split('p')[1];
 
         var historyDocument = new History({
-            socket_id: 'name',
-            c_id: 'c_id',
-            p_id: 'p_id',
-            messages: 'null'
+            socket_id: name.toString(),
+            c_id: 'null',
+            p_id: 'null',
+            messages: {
+                text: 'first message',
+                user: 'null'
+            }
         });
 
-        historyDocument.save();
+        console.log('salvando history: ' + historyDocument.save());
 
         socket.on('chat message', function(msg){    // emite uma mensagem para todos os clientes conectados
             namespace.emit('chat message', msg);     // informando a mensagem e o usuário que a enviou
             console.log(msg);
 
-            var message = new Message({
-                timestamp: new Date(),            
-                text: msg,
-                user: 'das' 
-            });           
         });
 
     });
