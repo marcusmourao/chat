@@ -45,15 +45,6 @@
                 <button class="btn btn-large right">Enviar</button>
             </div>
         </div>
-        <div class="row">
-            <div class="col s6 m6 l6 ">
-                <div class="input-field">
-                    <input id="privateUsername" type="text" class="validate bottom" autocomplete="off">
-                    <label for="privateUsername">Username do usuário destino</label>
-                        <a id="private" class=" btn btn-large left orange darken-4" >Enviar mensagem privada</a>
-                </div>
-            </div>
-        </div>
     </div>
 </form>
 <script src="/socket.io/socket.io.js"></script>
@@ -62,7 +53,8 @@
 
 <script>
 
-    var socket = io(); //cliente
+    var id = Number(window.location.pathname.match(/\/chat\/(\d+)$/)[1]);[]
+    var socket = io('/' + id); //cliente
 
     $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem
         socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
@@ -95,6 +87,8 @@
             $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
         }
     });
+
+
 </script>
 </body>
 </html>
