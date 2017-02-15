@@ -48,34 +48,44 @@ app.get('/', function(req, res){
 });
 
 
-http.listen(3000, function(){
+http.listen(3300, function(){
     console.log('listening on *:3000');
 });
 
 function createSocket(name) {
 
-    console.log(name);
-    var namespace = io.of('/' + name);
-    namespace.on('connection', function(socket){
+    var query = History.find({socket_id: name.toString()}, function (err, histories) {
 
+        console.log(histories.length);
 
-        var historyDocument = new History({
-            socket_id: name.toString(),
-            c_id: 'null',
-            p_id: 'null',
-            messages: {
-                text: 'first message',
-                user: 'null'
-            }
-        });
+        if(histories.length == 0){
+            var namespace = io.of('/' + name);
+            namespace.on('connection', function(socket){
+                var historyDocument = new History({
+                    socket_id: name.toString(),
+                    c_id: 'null',
+                    p_id: 'null',
+                    messages: {
+                        text: 'first message',
+                        user: 'null'
+                    }
+                });
 
-        console.log('salvando history: ' + historyDocument.save());
+                console.log('salvando history: ' + historyDocument.save());
 
-        socket.on('chat message', function(msg){    // emite uma mensagem para todos os clientes conectados
-            namespace.emit('chat message', msg);     // informando a mensagem e o usuário que a enviou
-            console.log(msg);
+                socket.on('chat message', function(msg){    // emite uma mensagem para todos os clientes conectados
+                    namespace.emit('chat message', msg);     // informando a mensagem e o usuário que a enviou
+                    console.log(msg);
 
-        });
+                });
 
+            });
+        }
+        else
+            console.log("Já existe esse socket");
     });
+    // console.log(name);
+
+
+
 }
