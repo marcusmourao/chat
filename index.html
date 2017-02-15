@@ -37,6 +37,7 @@
     </div>
 </div>
 <form id="formMessage" action="" method="post">
+    <input type="hidden" id="username" value="username_default">
     <div class="container">
         <div class="row">
             <div class="input-field">
@@ -60,13 +61,13 @@
     var socket = io('/' + id); //cliente
 
     $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem
-        socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
+        socket.emit('chat message', $('#message').val(), $('#username').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
         $('#message').val('');                            // limpa o conteúdo da caixa de texto
         return false;
     });
 
-    socket.on('chat message', function(msg){                    // Cliente ao receber um evento de chat message
-        $('#messages').append($('<li>').text(" diz: " + msg)); // Ao receber uma mensagem atualiza a tela
+    socket.on('chat message', function(msg, username){                    // Cliente ao receber um evento de chat message
+        $('#messages').append($('<li>').text(username + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
     });  
 
     

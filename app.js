@@ -21,6 +21,7 @@ var historySchema = mongoose.Schema({
     c_id: String,
     p_id: String,
     messages: [{
+        timestamp: String,
         text: String,
         user: String
     }]
@@ -35,7 +36,8 @@ app.use(bodyParser.json());
 
 app.post('/login', function(req, res){
     var chatName = req.body.chatName;
-    createSocket(chatName);
+    saveSocket(chatName);
+    entrySocket(chatName);
     res.redirect("/chat/" + chatName);
 });
 
@@ -52,40 +54,34 @@ http.listen(3300, function(){
     console.log('listening on *:3000');
 });
 
-function createSocket(name) {
-
+function saveSocket(name) {
     var query = History.find({socket_id: name.toString()}, function (err, histories) {
-
         console.log(histories.length);
-
-        if(histories.length == 0){
-            var namespace = io.of('/' + name);
-            namespace.on('connection', function(socket){
-                var historyDocument = new History({
-                    socket_id: name.toString(),
-                    c_id: 'null',
-                    p_id: 'null',
-                    messages: {
-                        text: 'first message',
-                        user: 'null'
-                    }
-                });
-
-                console.log('salvando history: ' + historyDocument.save());
-
-                socket.on('chat message', function(msg){    // emite uma mensagem para todos os clientes conectados
-                    namespace.emit('chat message', msg);     // informando a mensagem e o usuário que a enviou
-                    console.log(msg);
-
-                });
-
+        if(histories.length == 0) {
+            var c_id = name.split('p')[0];
+            var p_id = 'p' + name.split('p')[1];
+            var historyDocument = new History({
+                socket_id: name.toString(),
+                c_id: c_id.toString(),
+                p_id: p_id.toString(),
+                messages: {
+                    tempstamp: 'hahahahaha timestamp',
+                    text: 'first message',
+                    user: 'null'
+                }
             });
+            console.log('salvando history: ' + historyDocument.save());
         }
-        else
-            console.log("Já existe esse socket");
     });
-    // console.log(name);
+}
 
-
-
+function entrySocket(name) {
+    var namespace = io.of('/' + name);
+    console.log(namespace);
+    namespace.on('connection', function(socket){
+        socket.removeAllListeners();
+        socket.on('chat message', function(msg, username){    // emite uma mensagem para todos os clientes conectados
+            namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
+        });
+    });
 }
