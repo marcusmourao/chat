@@ -21,7 +21,7 @@ var historySchema = mongoose.Schema({
     c_id: String,
     p_id: String,
     messages: [{
-        timestamp: String,
+        last_date: String,
         text: String,
         user: String
     }]
@@ -65,7 +65,7 @@ function saveSocket(name) {
                 c_id: c_id.toString(),
                 p_id: p_id.toString(),
                 messages: {
-                    tempstamp: 'hahahahaha timestamp',
+                    last_date: new Date().toString(),
                     text: 'first message',
                     user: 'null'
                 }
@@ -78,10 +78,19 @@ function saveSocket(name) {
 function entrySocket(name) {
     var namespace = io.of('/' + name);
     console.log(namespace);
-    namespace.on('connection', function(socket){
+    namespace.on('connection', function (socket) {
         socket.removeAllListeners();
-        socket.on('chat message', function(msg, username){    // emite uma mensagem para todos os clientes conectados
+        socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
             namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
+            var query = History.find({socket_id: name.toString()}, function (err, histories) {
+                histories[0].messages.push({
+                    last_date: new Date().toString(),
+                    text: msg,
+                    user: username
+                });
+                histories[0].save();
+                console.log(histories[0].messages);
+            });
         });
-    });
+    })
 }
