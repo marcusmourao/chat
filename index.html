@@ -62,32 +62,11 @@
         return false;
     });
 
-    socket.on('chat message', function(msg, user){                    // Cliente ao receber um evento de chat message
-        $('#messages').append($('<li>').text(user + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
-    });
+    socket.on('chat message', function(msg){                    // Cliente ao receber um evento de chat message
+        $('#messages').append($('<li>').text(" diz: " + msg)); // Ao receber uma mensagem atualiza a tela
+    });  
 
-    socket.on('personal', function(msg, user, userDestination){                                                                                 // Cliente ao receber um evento de mensagem personal
-        $('#messages').append($('<li class="orange-text">').text(user + " diz: " + msg + " (mensagem privada para: "+ userDestination + " )")); // Ao receber uma mensagem atualiza a tela
-    });
-
-    socket.on('leave chat', function(msg){                           // Cliente ao receber um evento de saída do chat
-        $('#messages').append($('<li class="red-text">').text(msg)); // Ao receber um evento de saída avisa os demais usuários
-    });
-
-    socket.on('conect', function(username, user){                                           // Cliente ao receber um evento de entrada no chat
-        $('#messages').append($('<li class="green-text">').text(user + " entrou na sala")); // Ao receber um evento de entrada avisa todos os usuários
-        $("#users").empty();
-        for(var i=0; i< username.length; i++) {
-            $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
-        }
-    });
-    socket.on('update', function(username) {                             // Atualiza a lista de contatos online, necessário quando alguém sai do chat
-        $("#users").empty();
-        for (var i = 0; i < username.length; i++) {
-            $('#users').append("<tr><td>" + username[i] + "</td></tr>"); // Atualiza a lista de usuários onlines
-        }
-    });
-
+    
 
 </script>
 </body>
