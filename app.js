@@ -5,6 +5,7 @@ var app = require('express')();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
+var socketioJwt = require('socketio-jwt');
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/messages');
@@ -49,14 +50,18 @@ app.get('/', function(req, res){
     res.sendFile(__dirname + '/login.html');
 });
 
+app.get('/message', function(req, res){
+    res.sendFile(__dirname + '/message.html');
+});
 
-http.listen(3300, function(){
+
+http.listen(8080, function(){
     console.log('listening on *:3000');
 });
 
 function saveSocket(name) {
     var query = History.find({socket_id: name.toString()}, function (err, histories) {
-        console.log(histories.length);
+        // console.log(histories.length);
         if(histories.length == 0) {
             var c_id = name.split('p')[0];
             var p_id = 'p' + name.split('p')[1];
@@ -70,27 +75,40 @@ function saveSocket(name) {
                     user: 'null'
                 }
             });
-            console.log('salvando history: ' + historyDocument.save());
+            historyDocument.save();
         }
     });
 }
 
 function entrySocket(name) {
     var namespace = io.of('/' + name);
-    console.log(namespace);
-    namespace.on('connection', function (socket) {
-        socket.removeAllListeners();
-        socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
-            namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
-            var query = History.find({socket_id: name.toString()}, function (err, histories) {
-                histories[0].messages.push({
-                    last_date: new Date().toString(),
-                    text: msg,
-                    user: username
-                });
-                histories[0].save();
-                console.log(histories[0].messages);
-            });
-        });
-    })
+     namespace.on('connection', socketioJwt.authorize({
+        secret: 'vaiternespressosimounaomefalaquerosaber',
+        timeout: 15000 // 15 seconds to send the authentication message
+    })).
+
+     on('authenticated', function(socket) {
+        //this socket is authenticated, we are good to handle more events from it.
+        console.log('hello!');
+
+         socket.removeAllListeners();
+         socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
+             namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
+             var query = History.find({socket_id: name.toString()}, function (err, histories) {
+                 histories[0].messages.push({
+                     last_date: new Date().toString(),
+                     text: msg,
+                     user: username
+                 });
+                 histories[0].save();
+                 console.log(histories[0].messages);
+             });
+         });
+
+
+    });
+
+
+
+
 }

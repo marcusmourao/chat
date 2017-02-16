@@ -36,18 +36,21 @@
         </div>
     </div>
 </div>
-<form id="formMessage" action="" method="post">
-    <input type="hidden" id="username" value="username_default">
-    <div class="container">
-        <div class="row">
-            <div class="input-field">
-                <input name="message" id="message" type="text" class="validate bottom" autocomplete="off">
-                <label for="message">Mensagem</label>
-                <button class="btn btn-large right">Enviar</button>
+<div>
+    <form id="formMessage" action="" method="post">
+        <input type="hidden" id="username" value="username_default">
+        <div class="container">
+            <div class="row">
+                <div class="input-field">
+                    <input name="message" id="message" type="text" class="validate bottom" autocomplete="off">
+                    <label for="message">Mensagem</label>
+                    <button class="btn btn-large right">Enviar</button>
+                </div>
             </div>
         </div>
-    </div>
-</form>
+    </form>
+</div>
+
 <script src="/socket.io/socket.io.js"></script>
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
@@ -58,7 +61,18 @@
     var id = pathName.replace("/chat/", '');
     console.log(id);
 
-    var socket = io('/' + id); //cliente
+    var socket = io(('/' + id)); //cliente
+    socket.on('connect', function () {
+        socket.emit('authenticate', {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJjYXNhZWNhZmUuY29tIiwic3ViIjoiYXV0aCBzb2NrZXQgZm9yIG1lc3NhZ2VzIiwiYXVkIjoidXNlcnMiLCJpYXQiOjE0ODcyMDk5NTQsImV4cCI6MTQ4NzI5NjM1NCwidXNlciI6eyJjcmVhdGVkX2F0IjoiMjAxNy0wMi0wOCAwOTozODoyNCIsInVwZGF0ZWRfYXQiOiIyMDE3LTAyLTA4IDExOjIxOjU0IiwiaWQiOiJwNDA1MDIzIiwiZW1haWwiOiJqY3NtYXRoaWFzK3BhMzBAZ21haWwuY29tIiwidHlwZSI6InByb2Zlc3Npb25hbCIsImZhY2Vib29rX2lkIjpudWxsLCJpc19hY3RpdmUiOnRydWUsInBob3RvIjoiaHR0cHM6XC9cL3MzLXVzLXdlc3QtMi5hbWF6b25hd3MuY29tXC9jYXNhY2FmZS11c2Vycy1waG90b1wvdXNlcl9wNDA1MDIzX3Bob3RvXzU4OWIxYjcwYTgxNWQuanBnIn19.LB9IA2U5dLn1i56WsiBlULcIiIISG-ilulQKJFJbn8E'}) //send the jwt
+                .on('authenticated', function () {
+                    //do other things
+                })
+                .on('unauthorized', function(msg) {
+                    console.log("unauthorized: " + JSON.stringify(msg.data));
+                    throw new Error(msg.data.type);
+                })
+    });
+
 
     $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem
         socket.emit('chat message', $('#message').val(), $('#username').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
