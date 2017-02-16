@@ -37,8 +37,6 @@
 
     function verifica() {
         var email = $("#username").val();
-
-        console.log(email);
         $.post("http://ec2-35-161-164-176.us-west-2.compute.amazonaws.com:9076/users/login",
                 {
                     email: email
