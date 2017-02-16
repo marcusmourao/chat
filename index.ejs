@@ -199,6 +199,8 @@
             var m = "<div class=\"col s11 left-align\"> <div class=\"grey lighten-3 message-box incomming-msg\"> "+ msg +" <span class=\"message-text\"></span></div></div>";
             $('#messages').append(m);// Ao receber uma mensagem atualiza a tela
         }
+        $('#messages').scrollTop($('#messages')[0].scrollHeight);
+
 
     });
 
