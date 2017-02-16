@@ -1,7 +1,8 @@
 /**
  * Created by marcus on 18/12/16.
  */
-var app = require('express')();
+var express = require('express');
+var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
@@ -10,6 +11,7 @@ var usernames = [];
 var tokens =[];  // variavel global para empilhar o token
 
 app.set('view engine', 'ejs');  //view engine para passar parâmetros para a view
+app.use(express.static(__dirname + '/public'));
 
 
 
@@ -21,7 +23,6 @@ var db = mongoose.connection;
     db.on('error', console.error.bind(console, 'connection error:'));
     db.once('open', function() {
 });
-
 
 var historySchema = mongoose.Schema({
     socket_id: String,
@@ -67,7 +68,7 @@ app.get('/message', function(req, res){
 
 
 http.listen(8080, function(){
-    console.log('listening on *:3000');
+    console.log('listening on *:8080');
 });
 
 function saveSocket(name) {
