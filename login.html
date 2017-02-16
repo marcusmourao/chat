@@ -17,6 +17,7 @@
                 <i class="material-icons prefix">account_circle</i>
                 <input name="username" id="username" type="text" class="validate">
                 <label for="username">Username</label>
+                <a id="verifica" onclick="verifica()">verifica email</a>
 
                 <input name="chatName" id="chatName" type="text" class="validate">
                 <label for="chatName">ChatName</label>
@@ -32,6 +33,21 @@
 <script type="text/javascript" src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
 <!-- Compiled and minified JavaScript -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
+<script>
 
+    function verifica() {
+        var email = $("#username").val();
+
+        console.log(email);
+        $.post("http://ec2-35-161-164-176.us-west-2.compute.amazonaws.com:9076/users/login",
+                {
+                    email: email
+                },
+                function(data, status, body){
+                    $("#token").val(data.token);
+                });
+    }
+
+</script>
 </body>
 </html>
