@@ -6,6 +6,12 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var bodyParser = require('body-parser');
 var socketioJwt = require('socketio-jwt');
+var usernames = [];
+var tokens =[];  // variavel global para empilhar o token
+
+app.set('view engine', 'ejs');  //view engine para passar parâmetros para a view
+
+
 
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost/messages');
@@ -37,13 +43,18 @@ app.use(bodyParser.json());
 
 app.post('/login', function(req, res){
     var chatName = req.body.chatName;
+    var token = req.body.token;
+    var username = req.body.username;
+    tokens.push(token);
+    console.log(username);
+    usernames.push(username);
     saveSocket(chatName);
     entrySocket(chatName);
     res.redirect("/chat/" + chatName);
 });
 
 app.get('/chat/:chatName', function(req, res){
-    res.sendFile(__dirname + '/index.html');
+    res.render(__dirname + '/index.ejs', {token: tokens.pop(), username: usernames.pop()});
 });
 
 app.get('/', function(req, res){
@@ -61,7 +72,6 @@ http.listen(8080, function(){
 
 function saveSocket(name) {
     var query = History.find({socket_id: name.toString()}, function (err, histories) {
-        // console.log(histories.length);
         if(histories.length == 0) {
             var c_id = name.split('p')[0];
             var p_id = 'p' + name.split('p')[1];
@@ -89,8 +99,7 @@ function entrySocket(name) {
 
      on('authenticated', function(socket) {
         //this socket is authenticated, we are good to handle more events from it.
-        console.log('hello!');
-
+        // console.log('hello!' + socket.decoded_token.id);
          socket.removeAllListeners();
          socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
              namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
@@ -101,11 +110,9 @@ function entrySocket(name) {
                      user: username
                  });
                  histories[0].save();
-                 console.log(histories[0].messages);
+                 // console.log(histories[0].messages);
              });
          });
-
-
     });
 
 

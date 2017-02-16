@@ -24,9 +24,9 @@
         <div class="col s4 m4 l4">
             <table class="centered striped bordered">
                 <thead>
-                    <tr>
-                        <th> Usuários Online </th>
-                    </tr>
+                <tr>
+                    <th> Usuários Online </th>
+                </tr>
                 </thead>
                 <tbody id="users">
 
@@ -38,10 +38,11 @@
 </div>
 <div>
     <form id="formMessage" action="" method="post">
-        <input type="hidden" id="username" value="username_default">
+        <input type="hidden" id="username" value="<%=username%>">
         <div class="container">
             <div class="row">
                 <div class="input-field">
+                    <input id="token" type="hidden" value="<%=token%>">
                     <input name="message" id="message" type="text" class="validate bottom" autocomplete="off">
                     <label for="message">Mensagem</label>
                     <button class="btn btn-large right">Enviar</button>
@@ -59,11 +60,11 @@
 
     var pathName = window.location.pathname.toString();
     var id = pathName.replace("/chat/", '');
-    console.log(id);
+    var token = $("#token").val();
 
     var socket = io(('/' + id)); //cliente
     socket.on('connect', function () {
-        socket.emit('authenticate', {token: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJjYXNhZWNhZmUuY29tIiwic3ViIjoiYXV0aCBzb2NrZXQgZm9yIG1lc3NhZ2VzIiwiYXVkIjoidXNlcnMiLCJpYXQiOjE0ODcyMDk5NTQsImV4cCI6MTQ4NzI5NjM1NCwidXNlciI6eyJjcmVhdGVkX2F0IjoiMjAxNy0wMi0wOCAwOTozODoyNCIsInVwZGF0ZWRfYXQiOiIyMDE3LTAyLTA4IDExOjIxOjU0IiwiaWQiOiJwNDA1MDIzIiwiZW1haWwiOiJqY3NtYXRoaWFzK3BhMzBAZ21haWwuY29tIiwidHlwZSI6InByb2Zlc3Npb25hbCIsImZhY2Vib29rX2lkIjpudWxsLCJpc19hY3RpdmUiOnRydWUsInBob3RvIjoiaHR0cHM6XC9cL3MzLXVzLXdlc3QtMi5hbWF6b25hd3MuY29tXC9jYXNhY2FmZS11c2Vycy1waG90b1wvdXNlcl9wNDA1MDIzX3Bob3RvXzU4OWIxYjcwYTgxNWQuanBnIn19.LB9IA2U5dLn1i56WsiBlULcIiIISG-ilulQKJFJbn8E'}) //send the jwt
+        socket.emit('authenticate', {token: token.toString()}) //send the jwt
                 .on('authenticated', function () {
                     //do other things
                 })
@@ -82,9 +83,7 @@
 
     socket.on('chat message', function(msg, username){                    // Cliente ao receber um evento de chat message
         $('#messages').append($('<li>').text(username + " diz: " + msg)); // Ao receber uma mensagem atualiza a tela
-    });  
-
-    
+    });
 
 </script>
 </body>
