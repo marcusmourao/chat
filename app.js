@@ -67,7 +67,7 @@ app.post('/login', function(req, res){
     tokens.push(token);
     console.log(username);
     usernames.push(username);
-    saveSocket(chatName);
+    saveSocket(chatName, username);
     res.redirect("/chat/" + chatName);
 });
 
@@ -89,15 +89,28 @@ http.listen(8080, function(){
 });
 
 function entrySocket(name) {
+    var contractorStatus = 0;
+    var professionalStatus = 0;
+
     var namespace = io.of('/' + name);
     namespace.on('connection', socketioJwt.authorize({
         secret: 'vaiternespressosimounaomefalaquerosaber',
         timeout: 15000 // 15 seconds to send the authentication message
     })).
-
     on('authenticated', function(socket) {
+        if(socket.decoded_token.id[0]=='C')
+            contractorStatus += 1;
+        else
+            professionalStatus += 1;
+
+        console.log("C: " + contractorStatus);
+        console.log("P: " + professionalStatus);
+
         //this socket is authenticated, we are good to handle more events from it.
         // console.log('hello!' + socket.decoded_token.id);
+
+        namespace.emit('chat message', "usuário: " + socket.decoded_token.email + " está online", socket.decoded_token.email);
+
         socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
             namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
             var query = History.find({socket_id: name.toString()}, function (err, histories) {
@@ -109,6 +122,18 @@ function entrySocket(name) {
                 histories[0].save();
                 // console.log(histories[0].messages);
             });
+        });
+
+        socket.on('disconnect', function(){
+            namespace.emit('chat message', "usuário: " + socket.decoded_token.email + " está offline", socket.decoded_token.email);
+            if(socket.decoded_token.id[0]=='C')
+                contractorStatus -= 1;
+            else
+                professionalStatus -= 1;
+
+            console.log("C: " + contractorStatus);
+            console.log("P: " + professionalStatus);
+
         });
     });
 
