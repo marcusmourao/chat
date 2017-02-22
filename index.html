@@ -1,21 +1,4 @@
 
-This repository
-Search
-Pull requests
-Issues
-Gist
-@marcusmourao
-Sign out
-Unwatch 3
-Star 0
-Fork 0 marcusmourao/chat
-Code  Issues 0  Pull requests 0  Projects 0  Wiki  Pulse  Graphs  Settings
-Branch: master Find file Copy pathchat/index.html
-f3990f7  on 20 Dec 2016
-@marcusmourao marcusmourao Document code and update socket array in disconnect event
-1 contributor
-RawBlameHistory
-111 lines (96 sloc)  4.96 KB
 <!doctype html>
 <html>
 <head>
@@ -79,7 +62,7 @@ RawBlameHistory
 <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/0.97.8/js/materialize.min.js"></script>
 
 <script>
-    var socket = io(); //cliente
+    var socket = io('/mynamespace'); //cliente
     $('form').submit(function(){                          // Quando o usuário clica no botão de enviar mensagem
         socket.emit('chat message', $('#message').val()); // emite o evento de envio de mensagem para o socket com o tipo de mensagem "chat message"
         $('#message').val('');                            // limpa o conteúdo da caixa de texto
