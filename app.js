@@ -68,7 +68,6 @@ app.post('/login', function(req, res){
     console.log(username);
     usernames.push(username);
     saveSocket(chatName);
-    entrySocket(chatName);
     res.redirect("/chat/" + chatName);
 });
 
@@ -89,6 +88,32 @@ http.listen(8080, function(){
     console.log('listening on *:8080');
 });
 
+function entrySocket(name) {
+    var namespace = io.of('/' + name);
+    namespace.on('connection', socketioJwt.authorize({
+        secret: 'vaiternespressosimounaomefalaquerosaber',
+        timeout: 15000 // 15 seconds to send the authentication message
+    })).
+
+    on('authenticated', function(socket) {
+        //this socket is authenticated, we are good to handle more events from it.
+        // console.log('hello!' + socket.decoded_token.id);
+        socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
+            namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
+            var query = History.find({socket_id: name.toString()}, function (err, histories) {
+                histories[0].messages.push({
+                    last_date: new Date().toString(),
+                    text: msg,
+                    user: username
+                });
+                histories[0].save();
+                // console.log(histories[0].messages);
+            });
+        });
+    });
+
+}
+
 function saveSocket(name) {
     var query = History.find({socket_id: name.toString()}, function (err, histories) {
         if(histories.length == 0) {
@@ -105,36 +130,7 @@ function saveSocket(name) {
                 }
             });
             historyDocument.save();
+            entrySocket(name);
         }
     });
-}
-
-function entrySocket(name) {
-    var namespace = io.of('/' + name);
-     namespace.on('connection', socketioJwt.authorize({
-        secret: 'vaiternespressosimounaomefalaquerosaber',
-        timeout: 15000 // 15 seconds to send the authentication message
-    })).
-
-     on('authenticated', function(socket) {
-        //this socket is authenticated, we are good to handle more events from it.
-        // console.log('hello!' + socket.decoded_token.id);
-         socket.removeAllListeners();
-         socket.on('chat message', function (msg, username) {    // emite uma mensagem para todos os clientes conectados
-             namespace.emit('chat message', msg, username);     // informando a mensagem e o usuário que a enviou
-             var query = History.find({socket_id: name.toString()}, function (err, histories) {
-                 histories[0].messages.push({
-                     last_date: new Date().toString(),
-                     text: msg,
-                     user: username
-                 });
-                 histories[0].save();
-                 // console.log(histories[0].messages);
-             });
-         });
-    });
-
-
-
-
 }
